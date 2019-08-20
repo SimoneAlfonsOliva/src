@@ -1,0 +1,46 @@
+<!-- <nav class="navbar navbar-expand-lg navbar-light bg-light"> -->
+<nav>
+    <!-- <div class="collapse navbar-collapse" id="navbarColor03"> -->
+        <!-- <ul class="navbar-nav mr-auto"> -->
+        <ul>
+            <li>
+                <a><img width="300" alt="Angular Logo" src="http://www.nexsoft.it/wp-content/uploads/2018/05/logo-nexsoft.png"></a>
+            </li>
+            <!-- <li class="nav-item active"> -->
+            <li>
+                <a>{{' '+nome+' '}}</a>
+            </li>
+            <!-- <li class="nav-item "> -->
+            <li>
+                <a><b>&nbsp;Anno Corrente: {{anno}}&nbsp;</b></a>
+            </li>
+            <!-- <li class="nav-item "> -->
+            <li>
+                <a><b>
+                    <span class="cambiaCursore" (click)="cambiaMese(mese-1)">◄</span>
+                      &nbsp;Mese: {{mese+1}}&nbsp;
+                      <span class="cambiaCursore" (click)="cambiaMese(mese+1)">►</span> 
+                </b></a>
+            </li>    
+            <!-- <li class="nav-item ">&nbsp; -->
+            <li>
+                <a>
+                    <div class="btn-group btn-group-toggle" data-toggle="buttons">
+                        <label class="btn btn-primary btn-sm" [class.active]="scelto">
+                            Banca Ore?&nbsp;<input type="checkbox" value="bancaDati" (click)="cambiaScelto(bancaDati.checked)" #bancaDati>&nbsp;
+                        </label>
+                    </div>
+                </a>
+            </li>
+        </ul>
+    <!-- </div> -->
+</nav>
+<!-- Riprendi da qui, trova il modo di visualizzare le statistiche mensili qui -->
+<!-- <nav>
+    <ul>
+        
+            <li>
+                    <app-foot></app-foot>
+                </li>
+    </ul>
+</nav> -->

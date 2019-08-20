@@ -1,0 +1,216 @@
+<form [formGroup]="orarioLavoroForm" (ngSubmit)="invio(orarioLavoroForm)" novalidate (change)="segnaIDatiGiornalieri()">
+    <div class="form-group row">
+        <table class="table table-hover" id="tabella-princiaple">
+            <tr class="table-light">
+                <td> 
+                    <div class="form-group" *ngIf="!(orarioLavoroForm.errors?.disabilita || orarioLavoroForm.disabled )">
+                        <button type="button"  class="btn btn-primary" (click)="nuovaRiga()"> + </button> 
+                    </div>
+                    <div class="form-group"  *ngIf="orarioLavoroForm.errors?.disabilita || orarioLavoroForm.disabled">
+                        <button type="button" class="btn btn-primary" disabled> + </button> 
+                    </div>
+                </td>
+                <td>
+                     Giorno:  {{giorno}} 
+                </td>
+                <td>    
+                    <div  (change)="calcolaOrario(inizioMattina.value, fineMattina.value, inizioPomeriggio.value , finePomeriggio.value , giornoSuccessivo.value);">
+                        <table class="table table-hover">
+                            <div formGroupName="orari" *ngIf="!orarioLavoroForm.errors?.disabilita" >
+                                <tr>            
+                                    <b>Orario ingresso-uscita</b>
+                                </tr>
+                                <tr>
+                                    <ng-container formGroupName="orariMattina">
+                                        <td>
+                                            <label>Mattina:</label>
+                                        </td>
+                                        <td></td>
+                                        <td>
+                                            <input [class.is-invalid]="inizioMattina.errors?.required && inizioMattina.touched " formControlName="inizioMattina" type="time" [required]="orariMattina.errors?.obbligatorioMattina">
+                                        </td>
+                                        <td>
+                                            <input  formControlName="fineMattina" type="time" [required]="orariMattina.errors?.obbligatorioMattina" >
+                                        </td>
+                                    </ng-container>
+                                    <ng-container formGroupName="orariPomeriggio">       
+                                        <td>
+                                            <label>Pomeriggio:</label>
+                                        </td>
+                                        <td>
+                                            <input formControlName="inizioPomeriggio" type="time" [required]="orariPomeriggio.errors?.obbligatorioPomeriggio">
+                                        </td>
+                                        <td>
+                                            <input formControlName="finePomeriggio" type="time" [required]="orariPomeriggio.errors?.obbligatorioPomeriggio">
+                                        </td>         
+                                        <td>            
+                                            <!-- <div class="btn-group btn-group-toggle btn-sm" data-toggle="buttons">
+                                                <label class="btn btn-primary btn-sm" [class.active]=" giornoSuccessivo.value==true">
+                                                    <ng-container *ngIf="!orarioLavoroForm.disabled">
+                                                        <input type="checkbox" formControlName="giornoSuccessivo">
+                                                        Giorno Successivo?
+                                                    </ng-container>
+                                                    <ng-container *ngIf="orarioLavoroForm.disabled">
+                                                        <input type="checkbox" formControlName="giornoSuccessivo">
+                                                        Giorno Successivo?
+                                                    </ng-container>
+                                                </label>  
+                                            </div> -->
+                                            <div *ngIf="!orarioLavoroForm.disabled" class="form-check-inline">
+                                                Giorno Successivo?
+                                                <input type="checkbox" formControlName="giornoSuccessivo">
+                                            </div>
+                                            <div *ngIf="orarioLavoroForm.disabled" class="form-check-inline">
+                                                    Giorno Successivo?
+                                                <input type="checkbox" formControlName="giornoSuccessivo">
+                                            </div>
+                                        </td>
+                                    </ng-container>
+                                <div *ngIf="orariMattina.invalid || orariPomeriggio.invalids ">
+                                    <small class="text-danger"  [class.d-none]="orariMattina.untouched || (inizioMattina.valid && fineMattina.valid)">Orario Mattina non valido</small><br>
+                                    <small class="text-danger" [class.d-none]="orariPomeriggio.untouched || (inizioPomeriggio.valid && finePomeriggio.valid)">Orario Pomeriggio non valido</small>
+                                </div>    
+                            </div>
+                            <div class="text-danger" *ngIf="orarioLavoroForm.errors?.disabilita">Assenza giustificata</div>
+                        </table>
+                    </div> 
+                </td>
+                <td>
+                    Totale Ore 
+                    <div [innerText]="oreLavoroFormattate ? oreLavoroFormattate : 0 "></div> 
+                </td>
+                <td> 
+                    Motivazione assenza 
+                        <div class="bootstrap-select-wrapper" [class.d-none]="(totOre+ oreRigaSecondarie)>=8" >
+                                <select formControlName="motivoAssenza" >
+                                <option value="" *ngIf="(totOre+ oreRigaSecondarie)<8">Scegli un'opzione</option>
+                                <ng-container *ngIf="(totOre+ oreRigaSecondarie)<8">
+                                    <option *ngFor="let tipoAssenza of tipiAssenze; let i=index" [value]="tipoAssenza" >{{tipoAssenza}}</option>
+                                </ng-container>
+                            </select>
+                        </div>
+                        <div class="text-danger" *ngIf="(totOre+ oreRigaSecondarie)>=8">Nessuna giustifica necessaria</div>
+                </td>
+                <td>
+                    Reperibilità          
+                    <div class="bootstrap-select-wrapper" formGroupName="reperibilita" *ngIf="!orarioLavoroForm.errors?.disabilita" >
+                        <label>Inizio</label>
+                        <input type="time" min="00:00" [max]="fineReperibilita.value ? fineReperibilita.value : '23:59'" formControlName="inizioReperibilita">
+                        <label>Fine</label>
+                        <input type="time" [min]="inizioReperibilita.value ? inizioReperibilita.value : '00:00' " max="23:59" formControlName="fineReperibilita">
+                    </div>
+                    <ng-container *ngIf="inizioReperibilita.value !== '' && fineReperibilita.value !== ''">
+                        <div *ngIf="!(orarioLavoroForm.errors?.disabilita || orarioLavoroForm.disabled)">
+                            <button type="button" class="btn btn-secondary btn-sm" (click)="segnalaIntervento()" >Segnala Intervento</button>
+                        </div>
+                        <div *ngIf="(orarioLavoroForm.errors?.disabilita || orarioLavoroForm.disabled)">
+                            <button type="button" class="btn btn-secondary btn-sm" (click)="segnalaIntervento()" disabled >Segnala Intervento</button>
+                        </div>
+                    </ng-container>
+                </td>
+                <td>     
+                    Progetto/Cliente 
+                    <div *ngIf="!orarioLavoroForm.errors?.disabilita" >
+                        <select formControlName="clientiEProgetti" [class.is-invalid]="clientiEProgetti.invalid && clientiEProgetti.touched">
+                            <option value="">Seleziona un cliente</option>
+                            <option *ngFor="let cliente of clienti; let i=index"  [value]="cliente">Cliente {{cliente}}</option>
+                        </select>
+                        <small class="text-danger" [class.d-none]="clientiEProgetti.valid || clientiEProgetti.untouched"> Scegli un progetto </small>
+                    </div>
+                </td> 
+                <td>
+                    <ng-container *ngIf="!inviato"> 
+                        <button class="btn btn-outline-success" type="submit" [disabled]="!((clientiEProgetti.valid && inizioMattina.valid && fineMattina.valid  && inizioPomeriggio.valid && finePomeriggio.valid) || motivoAssenza.value === 'ferie' ||  motivoAssenza.value === 'malattia')">Salva</button> 
+                    </ng-container>
+                    <ng-container *ngIf="inviato"> 
+                        <button class="btn btn-outline-success" type="submit" disabled>Salva</button> 
+                    </ng-container>
+                    <div *ngIf="!(orarioLavoroForm.errors?.disabilita || orarioLavoroForm.disabled)">
+                        <button type="button" class="btn btn-outline-info" (click)="autocompila()">Autocompila</button>
+                    </div>
+                    <div *ngIf="orarioLavoroForm.errors?.disabilita || orarioLavoroForm.disabled">
+                        <button type="button" class="btn btn-outline-info" (click)="autocompila()" disabled>Autocompila</button>
+                    </div>
+                    <ng-container *ngIf="!inviato">
+                        <button class="btn btn-outline-warning" type="reset">Reset</button>
+                    </ng-container>
+                    <ng-container *ngIf="inviato">
+                        <button class="btn btn-outline-warning" type="reset" disabled>Reset</button>
+                    </ng-container>
+                </td>  
+            </tr>
+        </table>        
+    </div>
+     <ng-container formArrayName="righeSecondarie"  *ngFor="let riga of righeSecondarie.controls; let i=index">
+        <div class="form-group row" [formGroupName]="i" (change)="calcolaOrarioSecondario(righeSecondarie.get(i.toString()).get('orariMattinaSecondari').get('inizioMattinaSecondario').value, righeSecondarie.get(i.toString()).get('orariMattinaSecondari').get('fineMattinaSecondario').value, 
+        righeSecondarie.get(i.toString()).get('orariPomeriggioSecondari').get('inizioPomeriggioSecondario').value , righeSecondarie.get(i.toString()).get('orariPomeriggioSecondari').get('finePomeriggioSecondario').value , righeSecondarie.get(i.toString()).get('orariPomeriggioSecondari').get('giornoSuccessivoSecondario').value); ">
+            <table class="tabella-secondaria"> 
+                <tr>   
+                    <td>
+                        <button type="button" class="btn btn-danger" (click)="eliminaRiga(i)"> - </button>
+                    </td>
+                    <td>   
+                        <table class="tabella-secondaria"> 
+                            <tr>        
+                                <ng-container formGroupName="orariMattinaSecondari">
+                                    <th scope="col">Mattina:</th>
+                                    <td><input type="time" formControlName="inizioMattinaSecondario"></td>
+                                    <td><input type="time" formControlName="fineMattinaSecondario"></td>
+                                </ng-container>
+                                <ng-container formGroupName="orariPomeriggioSecondari">
+                                    <th scope="col">Pomeriggio:</th>
+                                    <td><input type="time" formControlName="inizioPomeriggioSecondario"></td>
+                                    <td><input type="time" formControlName="finePomeriggioSecondario"></td>
+                                    <td>
+                                        <!-- <div class="btn-group btn-group-toggle btn-sm" data-toggle="buttons">
+                                            <label class="btn btn-primary" [class.active]=" righeSecondarie.get(i.toString()).get('orariPomeriggioSecondari').get('giornoSuccessivoSecondario').value==true">
+                                                <div *ngIf="!orarioLavoroForm.disabled">
+                                                    <input type="checkbox" formControlName="giornoSuccessivoSecondario">
+                                                </div>
+                                                <div *ngIf="orarioLavoroForm.disabled">
+                                                    <input type="checkbox" formControlName="giornoSuccessivoSecondario" disabled>
+                                                </div>
+                                                Giorno Successivo?
+                                            </label>  
+                                        </div> -->
+                                        Giorno Successivo?
+                                        <div *ngIf="!orarioLavoroForm.disabled" class="form-check-inline">
+                                            <input type="checkbox" formControlName="giornoSuccessivoSecondario">
+                                        </div>
+                                        <div *ngIf="orarioLavoroForm.disabled" class="form-check-inline">
+                                            <input type="checkbox" formControlName="giornoSuccessivoSecondario" disabled>
+                                        </div>
+                                    </td>
+                                </ng-container>
+                            </tr>
+                        </table>
+                    </td>
+                    <td>
+                        <select formControlName="clientiEProgettiSecondario" required>
+                            <option value="">Seleziona un cliente</option>
+                            <option *ngFor="let cliente of clienti" [value]="cliente">Cliente {{cliente}}</option>
+                        </select>
+                    </td>         
+                </tr> 
+            </table>         
+        </div>
+    </ng-container>
+    <ng-container formArrayName="interventiSecondari" *ngFor="let interventoSecondario of interventiSecondari.controls; let i=index"
+     (input)="calcolaOreIntervento()">
+        <div class="form-group row div-secondaria">
+            <ng-container [formGroupName]="i">
+            <ng-container *ngIf="!orarioLavoroForm.disabled">
+                <button type="button" class="btn btn-danger" (click)="eliminaInterventoSecondario(i)"> - </button> 
+            </ng-container>
+            <ng-container *ngIf="orarioLavoroForm.disabled">
+                    <button type="button" class="btn btn-danger" (click)="eliminaInterventoSecondario(i)" disabled> - </button> 
+            </ng-container>  
+                <label>&nbsp;Intervento&nbsp;&nbsp;</label>
+                <label>&nbsp;Inizio&nbsp;</label>
+                <input type="time" formControlName="inizioReperibilitaSecondario">
+                <label>&nbsp;Fine&nbsp;</label>
+                <input type="time" formControlName="fineReperibilitaSecondario">    
+            </ng-container>
+        </div>
+    </ng-container> 
+</form>

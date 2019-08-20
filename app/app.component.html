@@ -1,0 +1,15 @@
+<!-- Container da eliminare una volta implementato il sistema di login LDAP -->
+<ng-container *ngIf="attivazioneAdmin()==-1">
+    chi sta effettuando l' accesso?
+    <button class="btn btn-primary" type="button" (click)="admin=true">ADMIN</button>
+    <button class="btn btn-secondary" type="button" (click)="admin=false">USER</button>
+</ng-container>
+<ng-container *ngIf="attivazioneAdmin()==1">
+    <app-area-admin></app-area-admin>
+</ng-container>
+<ng-container *ngIf="attivazioneAdmin()==0">
+    <app-head (eventoCambioData)="cambiaDataCorrente($event)"></app-head>
+    <app-body (datiAFoot)="inviaAFoot($event)" [mese]="mese" [anno]="anno"></app-body>
+    <app-foot [datiMensili]="inviaDatiMensili()" ></app-foot> 
+</ng-container>
+<router-outlet></router-outlet>

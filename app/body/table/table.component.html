@@ -1,0 +1,4 @@
+<button class="btn btn-primary" (click)="convalida()" [disabled]="inviabile">Convalida</button>
+<ng-container class="table table-hover" *ngFor= "let giorno of giorni; let i =index; trackBy: trackGiorniAggiunti">
+    <app-riga [mese]="mese" [anno]="anno" [giorno]='i+1' (addGiorno)="aggiungiRiga($event)" (invioDatiMensili)="calcolaOreTotali($event);aggiuntaATimeSheet($event)"></app-riga>
+</ng-container>
